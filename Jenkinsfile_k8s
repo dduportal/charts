@@ -1,3 +1,7 @@
+def credentialPerCluster = [
+  cik8s: "eks-ci-1-kubeconfig"
+]
+
 pipeline {
   agent {
     kubernetes {
@@ -84,8 +88,11 @@ pipeline {
         axes {
           axis {
             name 'K8S_CLUSTER'
-            values 'publick8s'
+            values 'publick8s', 'cik8s'
           }
+        }
+        environment {
+          KUBECONFIG = "${credentialPerCluster.containsKey(K8S_CLUSTER) ? credentials(credentialPerCluster[K8S_CLUSTER]) : '' }"
         }
         stages {
           stage('Prepare Environment'){
